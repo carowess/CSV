@@ -69,7 +69,6 @@ fig.autofmt_xdate()
 plt.show()
 
 
-'''
 # arguments for this function: # of rows, # of columns, index (which one are we trying to plot?)
 plt.subplot(2,1,1)
 plt.plot(dates,highs,c="red")
@@ -83,4 +82,4 @@ plt.suptitle("Highs and Lows of Sitka, Alaska")
 
 plt.show()
 
-'''
+
