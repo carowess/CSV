@@ -2,89 +2,77 @@ import csv
 import matplotlib.pyplot as plt
 from datetime import datetime
 
-#def get_weather_data(open_file,highs,lows,dates,date_index,high_index,low_index,name_index):
-open_file = open("death_valley_2018_simple.csv", "r")
-open_file = open('sitka_weather_2018_simple.csv',"r")
+open_file = open("sitka_weather_2018_simple.csv","r")
+open_file2 = open("death_valley_2018_simple.csv", "r")
 
-with open(open_file) as f:
-    csv_file = csv.reader(open_file,delimiter=",")
-    header_row = next(csv_file)
+csv_file = csv.reader(open_file,delimiter=",")
+csv_file2 =csv.reader(open_file2,delimiter=",")
 
-    date_index = header_row.index('DATE')
-    high_index = header_row.index('TMAX')
-    low_index = header_row.index('TMIN')
-    name_index = header_row.index('NAME')
+header_row = next(csv_file)
+header_row2 = next(csv_file2)
 
-def get_weather_data(highs,lows,dates,date_index,high_index,low_index,name_index):
-    for row in csv_file:
-        the_date = datetime.strptime(row[date_index],'%Y-%m-%d')
-        try: 
-            high = int(row[high_index])
-            low = int(row[low_index])
-        except ValueError:
-            print("Missing data for {the_date}")
-        else:
-            highs.append(high)
-            lows.append(low)
-            dates.append(the_date)
+location_title = next(csv_file) 
+location_title2 = next(csv_file2) 
 
-    return date_index, high_index,low_index,name_index
+def index_match(title,key):
+    for index in title:
+        if index == key:
+            return title.index(index)
 
+##SITKA
 
-#open_file = open("death_valley_2018_simple.csv", "r")
+sitka_lows = []
+sitka_highs = []
+sitka_dates = []
 
-dates = []
-highs = []
-lows = []
+for row in csv_file:
+    try: 
+        the_date = datetime.strptime(str(row[index_match(header_row,"DATE")]),'%Y-%m-%d')
+        high = int(row[int(index_match(header_row,"TMAX"))])
+        low = int(row[int(index_match(header_row,"TMIN"))])
+    except ValueError:
+        print(f"Missing data for {the_date}") 
+    else:
+        sitka_highs.append(int(row[index_match(header_row,"TMAX")]))
+        sitka_lows.append(int(row[index_match(header_row,"TMIN")]))
+        sitka_dates.append(the_date)
+    
+##DEATH VALLEY
+death_lows = []
+death_highs = []
+death_dates = []
 
-get_weather_data(highs,lows,dates,date_index,high_index,low_index,name_index)
+for row in csv_file2:
+    try: 
+        the_date = datetime.strptime(str(row[index_match(header_row2,"DATE")]),'%Y-%m-%d')
+        high = int(row[int(index_match(header_row2,"TMAX"))])
+        low = int(row[int(index_match(header_row2,"TMIN"))])
+    except ValueError:
+        print(f"Missing data for {the_date}") 
+    else:
+        death_highs.append(int(row[index_match(header_row2,"TMAX")]))
+        death_lows.append(int(row[index_match(header_row2,"TMIN")]))
+        death_dates.append(the_date)
+        
 
-fig, ax = plt.subplots()
-ax.plot(dates, highs, c='red', alpha=0.6)
-ax.plot(dates, lows, c='blue', alpha=0.6)
-plt.fill_between(dates, highs, lows, facecolor='blue', alpha=0.15)
+fig = plt.figure()
 
+plt.subplot(2,1,1)
+plt.plot(sitka_dates,sitka_highs,c="red")
+plt.plot(sitka_dates,sitka_lows,c="blue")
+plt.fill_between(sitka_dates,sitka_lows,sitka_highs,facecolor="blue",alpha=0.1)
+plt.title(location_title[1])
 
+plt.subplot(2,1,2)
+plt.plot(death_dates,death_highs,c="red")
+plt.plot(death_dates,death_lows,c="blue")
+plt.fill_between(death_dates,death_lows,death_highs,facecolor="blue",alpha=0.1)
+plt.title(location_title2[1])
 
-#open_file = open('sitka_weather_2018_simple.csv',"r")
-
-dates = []
-highs = []
-lows = []
-
-get_weather_data(open_file,highs,lows,dates,date_index,high_index,low_index,name_index)
-
-ax.plot(dates, highs, c='red', alpha=0.3)
-ax.plot(dates, lows, c='blue', alpha=0.3)
-plt.fill_between(dates, highs, lows, facecolor='blue', alpha=0.05)
-
-## making and showing the graph
-plt.title("Temperature comparison between SITKA AIRPORT, AK US and DEATH VALLEY, CA US", fontsize=16)
-plt.xlabel("",fontsize=12)
-plt.ylabel("Temperature (F)",fontsize=12)
-plt.tick_params(axis="both",which="major",labelsize=12)
-
-plt.plot(dates,highs,c="red",alpha=0.5)
-plt.plot(dates,lows,c='blue',alpha=0.5)
-
-plt.fill_between(dates,highs,lows,facecolor='blue',alpha=0.1)
+plt.suptitle(f"Temperature comparison between {location_title[1]} and {location_title2[1]}")
 
 fig.autofmt_xdate()
 
 plt.show()
 
-'''
-# arguments for this function: # of rows, # of columns, index (which one are we trying to plot?)
-plt.subplot(2,1,1)
-plt.plot(dates,highs,c="red")
-plt.title("Highs")
 
-plt.subplot(2,1,2)
-plt.plot(dates,lows,c="blue")
-plt.title("Lows")
-
-plt.suptitle("Highs and Lows of Sitka, Alaska")
-
-plt.show()
-
-'''
